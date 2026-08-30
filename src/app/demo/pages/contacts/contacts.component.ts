@@ -30,19 +30,28 @@ export class ContactsComponent implements OnInit {
   }
 
   get filteredMessages(): ContactMessage[] {
+    const term = this.searchTerm.toLowerCase();
     return this.messages.filter(m => {
-      const matchesSearch = 
-        m.name.toLowerCase().includes(this.searchTerm.toLowerCase()) || 
-        m.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+      const matchesSearch =
+        (m.name ?? '').toLowerCase().includes(term) ||
+        (m.email ?? '').toLowerCase().includes(term) ||
         m.phoneNumber.includes(this.searchTerm);
-      
-      const matchesFilter = 
-        this.filterStatus === 'all' || 
-        (this.filterStatus === 'read' && m.isRead) || 
+
+      const matchesFilter =
+        this.filterStatus === 'all' ||
+        (this.filterStatus === 'read' && m.isRead) ||
         (this.filterStatus === 'unread' && !m.isRead);
-      
+
       return matchesSearch && matchesFilter;
     }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  displayName(message: ContactMessage): string {
+    return message.name?.trim() || message.phoneNumber;
+  }
+
+  displayInitial(message: ContactMessage): string {
+    return this.displayName(message).charAt(0).toUpperCase();
   }
 
   ngOnInit(): void {

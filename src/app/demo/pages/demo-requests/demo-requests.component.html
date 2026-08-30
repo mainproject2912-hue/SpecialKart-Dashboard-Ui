@@ -61,6 +61,7 @@
                   <th class="px-4 py-3">#</th>
                   <th class="py-3">Name</th>
                   <th class="py-3">WhatsApp</th>
+                  <th class="py-3">Event Type</th>
                   <th class="py-3">Status</th>
                   <th class="py-3">Image</th>
                   <th class="py-3">Date</th>
@@ -73,6 +74,13 @@
                     <td class="px-4 text-muted small">{{ r.id }}</td>
                     <td class="fw-semibold">{{ r.name }}</td>
                     <td dir="ltr" class="font-monospace small">{{ r.whatsAppNumber }}</td>
+                    <td>
+                      @if (r.eventType) {
+                        <span class="badge bg-light text-dark border px-2 py-1">{{ r.eventType }}</span>
+                      } @else {
+                        <span class="text-muted small">—</span>
+                      }
+                    </td>
                     <td>
                       @if (r.isVerified) {
                         <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">

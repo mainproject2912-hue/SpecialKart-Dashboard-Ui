@@ -5,8 +5,8 @@ import { environment } from 'src/environments/environment';
 
 export interface ContactMessage {
   id: number;
-  name: string;
-  email: string;
+  name: string | null;
+  email: string | null;
   phoneNumber: string;
   message: string;
   createdAt: string;
