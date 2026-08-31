@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { ContactService, ContactMessage } from 'src/app/theme/shared/service/contact.service';
 import { ToastService } from 'src/app/theme/shared/service/toast.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-contacts',
@@ -17,33 +18,109 @@ export class ContactsComponent implements OnInit {
   error = '';
   selectedMessage: ContactMessage | null = null;
   searchTerm = '';
+  startDate = '';
+  endDate = '';
   filterStatus: 'all' | 'read' | 'unread' = 'all';
+  filterType: 'all' | 'package' | 'design' = 'all';
 
   constructor(
     private contactService: ContactService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   get unreadCount(): number {
     return this.messages.filter(m => !m.isRead).length;
   }
 
+  getMessageType(m: ContactMessage): 'package' | 'design' | 'general' {
+    const text = (m.message || '').toLowerCase();
+    if (text.includes('باقة') || text.includes('package')) {
+      return 'package';
+    }
+    if (text.includes('كارت') || text.includes('تصميم') || text.includes('card') || text.includes('design') || text.includes('كود')) {
+      return 'design';
+    }
+    return 'general';
+  }
+
+  get packageMessagesCount(): number {
+    return this.messages.filter(m => this.getMessageType(m) === 'package').length;
+  }
+
+  get designMessagesCount(): number {
+    return this.messages.filter(m => this.getMessageType(m) === 'design').length;
+  }
+
   get filteredMessages(): ContactMessage[] {
-    const term = this.searchTerm.toLowerCase();
+    const term = (this.searchTerm || '').toLowerCase().trim();
     return this.messages.filter(m => {
-      const matchesSearch =
+      const matchesSearch = !term ||
         (m.name ?? '').toLowerCase().includes(term) ||
         (m.email ?? '').toLowerCase().includes(term) ||
-        m.phoneNumber.includes(this.searchTerm);
+        (m.message ?? '').toLowerCase().includes(term) ||
+        (m.phoneNumber ?? '').includes(term);
 
-      const matchesFilter =
+      const matchesStatus =
         this.filterStatus === 'all' ||
         (this.filterStatus === 'read' && m.isRead) ||
         (this.filterStatus === 'unread' && !m.isRead);
 
-      return matchesSearch && matchesFilter;
+      const msgType = this.getMessageType(m);
+      const matchesType =
+        this.filterType === 'all' ||
+        (this.filterType === 'package' && msgType === 'package') ||
+        (this.filterType === 'design' && msgType === 'design');
+
+      let matchesDate = true;
+      if (m.createdAt) {
+        const msgDate = new Date(m.createdAt).getTime();
+        if (this.startDate) {
+          const start = new Date(this.startDate);
+          start.setHours(0, 0, 0, 0);
+          if (msgDate < start.getTime()) matchesDate = false;
+        }
+        if (this.endDate) {
+          const end = new Date(this.endDate);
+          end.setHours(23, 59, 59, 999);
+          if (msgDate > end.getTime()) matchesDate = false;
+        }
+      }
+
+      return matchesSearch && matchesStatus && matchesType && matchesDate;
     }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.filterStatus = 'all';
+    this.filterType = 'all';
+  }
+
+  setCategoryFilter(type: 'all' | 'package' | 'design'): void {
+    this.filterType = type;
+  }
+
+  openWhatsApp(phone: string): void {
+    const clean = phone.replace('+', '').replace(/\s+/g, '');
+    window.open(`https://wa.me/${clean}`, '_blank');
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['type']) {
+        const t = params['type'];
+        if (t === 'package' || t === 'design' || t === 'general') {
+          this.filterType = t;
+        }
+      }
+    });
+
+    this.loadData();
   }
 
   displayName(message: ContactMessage): string {
@@ -52,10 +129,6 @@ export class ContactsComponent implements OnInit {
 
   displayInitial(message: ContactMessage): string {
     return this.displayName(message).charAt(0).toUpperCase();
-  }
-
-  ngOnInit(): void {
-    this.loadData();
   }
 
   loadData(silent = false): void {

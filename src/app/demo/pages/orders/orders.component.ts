@@ -6,6 +6,7 @@ import { ToastService } from 'src/app/theme/shared/service/toast.service';
 import { InvitationCardService, InvitationCard } from 'src/app/theme/shared/service/invitation-card.service';
 import { PackageService, Package } from 'src/app/theme/shared/service/package.service';
 import { forkJoin } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
@@ -23,19 +24,65 @@ export class OrdersComponent implements OnInit {
   selectedOrder: Order | null = null;
   OrderStatus = OrderStatus;
 
+  activeFilter: 'all' | 'design' | 'package' = 'all';
+
   constructor(
     private orderService: OrderService,
     private cardService: InvitationCardService,
     private packageService: PackageService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
+  get filteredOrders(): Order[] {
+    if (this.activeFilter === 'design') {
+      return this.orders.filter(o => o.invitationCardId || !o.packageId);
+    } else if (this.activeFilter === 'package') {
+      return this.orders.filter(o => !!o.packageId);
+    }
+    return this.orders;
+  }
+
+  get designOrdersCount(): number {
+    return this.orders.filter(o => o.invitationCardId || !o.packageId).length;
+  }
+
+  get packageOrdersCount(): number {
+    return this.orders.filter(o => !!o.packageId).length;
+  }
+
   getPendingOrdersCount(): number {
-    return this.orders.filter(o => o.status === OrderStatus.Pending).length;
+    return this.filteredOrders.filter(o => o.status === OrderStatus.Pending).length;
+  }
+
+  setFilter(filter: 'all' | 'design' | 'package'): void {
+    this.activeFilter = filter;
+    let url = '/orders';
+    if (filter === 'design') url = '/orders/designs';
+    else if (filter === 'package') url = '/orders/packages';
+    this.router.navigateByUrl(url);
+  }
+
+  openWhatsApp(phone: string): void {
+    const clean = phone.replace('+', '').replace(/\s+/g, '');
+    window.open(`https://wa.me/${clean}`, '_blank');
   }
 
   ngOnInit(): void {
+    this.route.data.subscribe(data => {
+      if (data['filterType']) {
+        this.activeFilter = data['filterType'];
+      }
+    });
+
+    this.route.queryParams.subscribe(params => {
+      if (params['type']) {
+        this.activeFilter = params['type'];
+      }
+    });
+
     this.loadData();
   }
 

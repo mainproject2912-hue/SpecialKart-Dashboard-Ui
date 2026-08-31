@@ -1,17 +1,20 @@
-<div class="row animate__animated animate__fadeIn">
+<div class="row animate__animated animate__fadeIn" dir="rtl">
   <div class="col-sm-12">
 
-    <!-- Header -->
-    <div class="card border-0 shadow-sm mb-4 bg-dark text-white overflow-hidden" style="border-radius: 15px;">
+    <!-- Header Card with Dark Text for perfect readability -->
+    <div class="card border-0 shadow-sm mb-4 bg-white border-start border-4 border-success overflow-hidden" style="border-radius: 15px;">
       <div class="card-body p-4">
         <div class="row align-items-center">
-          <div class="col-md-6">
-            <h4 class="mb-1 fw-bold text-white"><i class="ti ti-brand-whatsapp me-2"></i> Demo Requests</h4>
-            <p class="text-white-50 mb-0">Users who tried the free WhatsApp demo</p>
+          <div class="col-md-7">
+            <h4 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+              <i class="ti ti-brand-whatsapp text-success fs-3"></i>
+              طلبات التجربة المجانية (Free Demo Requests)
+            </h4>
+            <p class="text-muted mb-0">العملاء المهتمون الذين قاموا بتجربة إرسال الكروت المجانية والتحقق عبر الواتساب (OTP)</p>
           </div>
-          <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <button class="btn btn-outline-light px-4" (click)="load()" [disabled]="loading">
-              <i class="ti ti-refresh me-2"></i> Refresh
+          <div class="col-md-5 text-md-start mt-3 mt-md-0">
+            <button class="btn btn-outline-dark px-4 rounded-pill" (click)="load()" [disabled]="loading">
+              <i class="ti ti-refresh me-2"></i> تحديث البيانات
             </button>
           </div>
         </div>
@@ -21,21 +24,68 @@
     <!-- Stats -->
     <div class="row mb-4">
       <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px; border-top: 4px solid #0d6efd;">
-          <h2 class="fw-bold mb-0">{{ requests.length }}</h2>
-          <p class="text-muted mb-0 small">Total Requests</p>
+        <div class="card border-0 shadow-sm text-center p-3 bg-white" style="border-radius:12px; border-top: 4px solid #0d6efd;">
+          <h2 class="fw-bold mb-0 text-primary">{{ requests.length }}</h2>
+          <p class="text-dark mb-0 small fw-bold">إجمالي الطلبات (Total Requests)</p>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px; border-top: 4px solid #22c55e;">
+        <div class="card border-0 shadow-sm text-center p-3 bg-white" style="border-radius:12px; border-top: 4px solid #22c55e;">
           <h2 class="fw-bold mb-0 text-success">{{ verified }}</h2>
-          <p class="text-muted mb-0 small">Verified & Card Sent</p>
+          <p class="text-dark mb-0 small fw-bold">تم التفعيل وإرسال الكارت (Verified & Sent)</p>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px; border-top: 4px solid #f39c12;">
+        <div class="card border-0 shadow-sm text-center p-3 bg-white" style="border-radius:12px; border-top: 4px solid #f39c12;">
           <h2 class="fw-bold mb-0 text-warning">{{ pending }}</h2>
-          <p class="text-muted mb-0 small">OTP Not Verified</p>
+          <p class="text-dark mb-0 small fw-bold">لم يتم إدخال الرمز OTP (Pending)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Date Filter Card -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+      <div class="card-body p-3">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-5">
+            <label class="form-label small text-dark fw-bold mb-1">البحث باسم العميل أو رقم الواتساب</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0"><i class="ti ti-search text-dark"></i></span>
+              <input 
+                type="text" 
+                class="form-control border-start-0 text-end" 
+                placeholder="ابحث بالاسم، رقم الواتساب، الفئة..." 
+                [(ngModel)]="searchTerm" />
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small text-dark fw-bold mb-1">من تاريخ (Start Date)</label>
+            <input 
+              type="date" 
+              class="form-control text-end" 
+              [(ngModel)]="startDate" />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small text-dark fw-bold mb-1">إلى تاريخ (End Date)</label>
+            <input 
+              type="date" 
+              class="form-control text-end" 
+              [(ngModel)]="endDate" />
+          </div>
+
+          <div class="col-md-1 d-flex align-items-end">
+            @if (startDate || endDate || searchTerm) {
+              <button 
+                type="button" 
+                class="btn btn-outline-danger w-100 mt-md-4 py-2" 
+                (click)="clearFilters()" 
+                title="مسح وتفريغ الفلاتر">
+                <i class="ti ti-rotate"></i>
+              </button>
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -46,35 +96,35 @@
         @if (loading) {
           <div class="text-center py-5">
             <div class="spinner-border text-dark" role="status"></div>
-            <p class="mt-2 text-muted">Loading...</p>
+            <p class="mt-2 text-muted">جاري تحميل البيانات...</p>
           </div>
-        } @else if (requests.length === 0) {
+        } @else if (filteredRequests.length === 0) {
           <div class="text-center py-5 text-muted">
             <i class="ti ti-inbox" style="font-size:3rem;"></i>
-            <p class="mt-2">No demo requests yet</p>
+            <p class="mt-2">لا يوجد طلبات تجربة مجانية مطابقة للفلاتر حالياً</p>
           </div>
         } @else {
           <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
+            <table class="table table-hover align-middle mb-0 text-end">
+              <thead class="bg-light">
                 <tr>
                   <th class="px-4 py-3">#</th>
-                  <th class="py-3">Name</th>
-                  <th class="py-3">WhatsApp</th>
-                  <th class="py-3">Event Type</th>
-                  <th class="py-3">Category</th>
-                  <th class="py-3">Status</th>
-                  <th class="py-3">Image</th>
-                  <th class="py-3">Date</th>
-                  <th class="py-3"></th>
+                  <th class="py-3">الاسم</th>
+                  <th class="py-3">رقم الواتساب</th>
+                  <th class="py-3">نوع المناسبة</th>
+                  <th class="py-3">الفئة</th>
+                  <th class="py-3">حالة التفعيل</th>
+                  <th class="py-3">الكارت المعاين</th>
+                  <th class="py-3">التاريخ</th>
+                  <th class="py-3 text-start px-4">إجراءات</th>
                 </tr>
               </thead>
               <tbody>
-                @for (r of requests; track r.id) {
+                @for (r of filteredRequests; track r.id) {
                   <tr>
-                    <td class="px-4 text-muted small">{{ r.id }}</td>
-                    <td class="fw-semibold">{{ r.name }}</td>
-                    <td dir="ltr" class="font-monospace small">{{ r.whatsAppNumber }}</td>
+                    <td class="px-4 text-muted small font-monospace">#{{ r.id }}</td>
+                    <td class="fw-semibold text-dark">{{ r.name || 'غير محدد' }}</td>
+                    <td dir="ltr" class="font-monospace small text-end">{{ r.whatsAppNumber }}</td>
                     <td>
                       @if (r.eventType) {
                         <span class="badge bg-light text-dark border px-2 py-1">{{ r.eventType }}</span>
@@ -84,34 +134,34 @@
                     </td>
                     <td>
                       @if (r.category) {
-                        <span class="badge bg-light text-dark border px-2 py-1">{{ r.category === 'companies' ? 'Companies' : r.category === 'individuals' ? 'Individuals' : r.category }}</span>
+                        <span class="badge bg-light text-dark border px-2 py-1">{{ r.category === 'companies' ? 'شركات' : r.category === 'individuals' ? 'أفراد' : r.category }}</span>
                       } @else {
                         <span class="text-muted small">—</span>
                       }
                     </td>
                     <td>
                       @if (r.isVerified) {
-                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                          <i class="ti ti-check me-1"></i> Verified
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                          <i class="ti ti-check me-1"></i> موثّق ومُرسل
                         </span>
                       } @else {
-                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
-                          <i class="ti ti-clock me-1"></i> Pending
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill">
+                          <i class="ti ti-clock me-1"></i> بانتظار الـ OTP
                         </span>
                       }
                     </td>
                     <td>
                       @if (r.image) {
-                        <img [src]="r.image" alt="card" style="height:40px;width:40px;object-fit:cover;border-radius:6px;cursor:pointer;"
-                          (click)="openImage(r.image)">
+                        <img [src]="r.image" alt="card" style="height:42px;width:42px;object-fit:cover;border-radius:8px;cursor:pointer;"
+                          (click)="openImage(r.image)" title="اضغط للتكبير">
                       } @else {
                         <span class="text-muted small">—</span>
                       }
                     </td>
                     <td class="small text-muted">{{ formatDate(r.createdAt) }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-success" (click)="openWhatsApp(r.whatsAppNumber)" title="Open WhatsApp">
-                        <i class="ti ti-brand-whatsapp"></i>
+                    <td class="text-start px-4">
+                      <button class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 rounded-pill px-3" (click)="openWhatsApp(r.whatsAppNumber)" title="مراسلة الواتساب مباشرة">
+                        <i class="ti ti-brand-whatsapp"></i> مراسلة
                       </button>
                     </td>
                   </tr>

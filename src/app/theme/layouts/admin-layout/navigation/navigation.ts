@@ -20,14 +20,14 @@ export interface NavigationItem {
 
 export const NavigationItems: NavigationItem[] = [
   {
-    id: 'dashboard',
-    title: 'Dashboard',
+    id: 'overview',
+    title: 'الرئيسية | Overview',
     type: 'group',
     icon: 'icon-navigation',
     children: [
       {
         id: 'default',
-        title: 'Default',
+        title: 'لوحة التحكم',
         type: 'item',
         classes: 'nav-item',
         url: '/dashboard/default',
@@ -37,23 +37,49 @@ export const NavigationItems: NavigationItem[] = [
     ]
   },
   {
-    id: 'management',
-    title: 'Management',
+    id: 'form-submissions',
+    title: 'طلبات النماذج والعملاء | Form Submissions',
+    type: 'group',
+    icon: 'icon-navigation',
+    children: [
+      {
+        id: 'demo-requests',
+        title: 'طلبات التجربة المجانية',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/demo-requests',
+        icon: 'experiment',
+        breadcrumbs: false
+      },
+      {
+        id: 'contacts',
+        title: 'رسائل الاستفسارات والطلبات',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/contacts',
+        icon: 'mail',
+        breadcrumbs: false
+      }
+    ]
+  },
+  {
+    id: 'catalog-management',
+    title: 'إدارة المحتوى والخدمات | Catalog',
     type: 'group',
     icon: 'icon-navigation',
     children: [
       {
         id: 'invitation-cards',
-        title: 'Invitation Cards',
+        title: 'بطاقات الدعوة',
         type: 'item',
         classes: 'nav-item',
         url: '/invitation-cards',
-        icon: 'picture',
+        icon: 'layout',
         breadcrumbs: false
       },
       {
         id: 'packages',
-        title: 'Packages',
+        title: 'باقات الأسعار',
         type: 'item',
         classes: 'nav-item',
         url: '/packages',
@@ -61,35 +87,8 @@ export const NavigationItems: NavigationItem[] = [
         breadcrumbs: false
       },
       {
-        id: 'blog',
-        title: 'Blog',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/blog',
-        icon: 'read',
-        breadcrumbs: false
-      },
-      {
-        id: 'testimonials',
-        title: 'Testimonials',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/testimonials',
-        icon: 'comment',
-        breadcrumbs: false
-      },
-      {
-        id: 'supervisors',
-        title: 'Supervisors',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/supervisors',
-        icon: 'user',
-        breadcrumbs: false
-      },
-      {
         id: 'orders',
-        title: 'Orders',
+        title: 'الطلبات والمشتريات',
         type: 'item',
         classes: 'nav-item',
         url: '/orders',
@@ -97,35 +96,8 @@ export const NavigationItems: NavigationItem[] = [
         breadcrumbs: false
       },
       {
-        id: 'contacts',
-        title: 'Contact Messages',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/contacts',
-        icon: 'mail',
-        breadcrumbs: false
-      },
-      {
-        id: 'countries',
-        title: 'Countries',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/countries',
-        icon: 'global',
-        breadcrumbs: false
-      },
-      {
-        id: 'cities',
-        title: 'Cities',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/cities',
-        icon: 'environment',
-        breadcrumbs: false
-      },
-      {
         id: 'event-types',
-        title: 'Event Types',
+        title: 'أنواع المناسبات',
         type: 'item',
         classes: 'nav-item',
         url: '/event-types',
@@ -134,7 +106,7 @@ export const NavigationItems: NavigationItem[] = [
       },
       {
         id: 'features',
-        title: 'Features',
+        title: 'المميزات والخصائص',
         type: 'item',
         classes: 'nav-item',
         url: '/features',
@@ -142,26 +114,70 @@ export const NavigationItems: NavigationItem[] = [
         breadcrumbs: false
       },
       {
-        id: 'register',
-        title: 'Register User',
+        id: 'supervisors',
+        title: 'المشرفين',
         type: 'item',
         classes: 'nav-item',
-        url: '/register',
+        url: '/supervisors',
         icon: 'user',
         breadcrumbs: false
       },
       {
-        id: 'demo-requests',
-        title: 'Demo Requests',
+        id: 'blog',
+        title: 'المدونة',
         type: 'item',
         classes: 'nav-item',
-        url: '/demo-requests',
-        icon: 'experiment',
+        url: '/blog',
+        icon: 'read',
+        breadcrumbs: false
+      },
+      {
+        id: 'testimonials',
+        title: 'آراء العملاء',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/testimonials',
+        icon: 'comment',
+        breadcrumbs: false
+      }
+    ]
+  },
+  {
+    id: 'system-settings-group',
+    title: 'النظام والإعدادات | System',
+    type: 'group',
+    icon: 'icon-navigation',
+    children: [
+      {
+        id: 'countries',
+        title: 'الدول',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/countries',
+        icon: 'global',
+        breadcrumbs: false
+      },
+      {
+        id: 'cities',
+        title: 'المدن',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/cities',
+        icon: 'environment',
+        breadcrumbs: false
+      },
+      {
+        id: 'register',
+        title: 'تسجيل مستخدم',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/register',
+        icon: 'user-add',
         breadcrumbs: false
       },
       {
         id: 'site-settings',
-        title: 'Site Settings',
+        title: 'إعدادات الموقع',
         type: 'item',
         classes: 'nav-item',
         url: '/site-settings',

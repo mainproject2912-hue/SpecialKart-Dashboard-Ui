@@ -1,20 +1,70 @@
-<div class="row">
+<div class="row" dir="rtl">
   <div class="col-sm-12">
-    <div class="card border-0 shadow-sm mb-4">
+    <!-- Header & Filter Tabs -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
       <div class="card-body py-3">
-        <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
           <div>
-            <h5 class="mb-0 fw-bold">Orders Management</h5>
-            <p class="text-muted small mb-0">Track and manage customer orders</p>
+            <h4 class="mb-1 fw-bold text-dark d-flex align-items-center gap-2">
+              <i class="ti ti-shopping-cart text-primary"></i>
+              @if (activeFilter === 'design') {
+                طلبات تصاميم الكروت (Design Requests)
+              } @else if (activeFilter === 'package') {
+                طلبات الباقات (Package Requests)
+              } @else {
+                جميع طلبات استمارات الموقع (All Orders)
+              }
+            </h4>
+            <p class="text-muted small mb-0">متابعة وإدارة الطلبات المقدمة عبر نماذج الموقع والإشعارات</p>
           </div>
-          <div class="d-flex gap-2">
-             <div class="badge bg-light-warning text-warning px-3 py-2 border">
-                {{ getPendingOrdersCount() }} Pending
-             </div>
-             <div class="badge bg-light-primary text-primary px-3 py-2 border">
-                {{ orders.length }} Total
-             </div>
+
+          <!-- Quick Stats & Badges -->
+          <div class="d-flex align-items-center gap-2">
+            <div class="badge bg-light-warning text-warning px-3 py-2 border rounded-pill">
+              {{ getPendingOrdersCount() }} قيد الانتظار
+            </div>
+            <div class="badge bg-light-primary text-primary px-3 py-2 border rounded-pill">
+              {{ filteredOrders.length }} إجمالي المعروض
+            </div>
           </div>
+        </div>
+
+        <hr class="my-3 opacity-10">
+
+        <!-- Navigation Tabs -->
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button 
+            type="button" 
+            class="btn btn-sm px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all fw-semibold"
+            [class.btn-dark]="activeFilter === 'all'"
+            [class.btn-light]="activeFilter !== 'all'"
+            (click)="setFilter('all')">
+            <i class="ti ti-list"></i>
+            جميع الطلبات
+            <span class="badge rounded-pill bg-secondary ms-1">{{ orders.length }}</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-sm px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all fw-semibold"
+            [class.btn-dark]="activeFilter === 'design'"
+            [class.btn-light]="activeFilter !== 'design'"
+            (click)="setFilter('design')">
+            <i class="ti ti-photo"></i>
+            طلبات تصاميم الكروت
+            <span class="badge rounded-pill bg-primary ms-1">{{ designOrdersCount }}</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-sm px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all fw-semibold"
+            [class.btn-dark]="activeFilter === 'package'"
+            [class.btn-light]="activeFilter !== 'package'"
+            (click)="setFilter('package')">
+            <i class="ti ti-package"></i>
+            طلبات الباقات
+            <span class="badge rounded-pill bg-warning text-dark ms-1">{{ packageOrdersCount }}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -23,7 +73,7 @@
   @if (loading && orders.length === 0) {
     <div class="col-12 text-center py-5">
       <div class="spinner-border text-dark" role="status">
-        <span class="visually-hidden">Loading...</span>
+        <span class="visually-hidden">جاري التحميل...</span>
       </div>
     </div>
   } @else if (error) {
@@ -32,13 +82,15 @@
     </div>
   } @else {
     <div class="col-sm-12">
-      <div class="card border-0 shadow-sm">
+      <div class="card border-0 shadow-sm" style="border-radius: 12px;">
         <div class="table-responsive">
           <table class="table table-hover mb-0 align-middle text-end" dir="rtl">
             <thead class="bg-light">
               <tr>
                 <th class="pr-4">رقم الطلب</th>
-                <th>العميل</th>
+                <th>نوع النموذج</th>
+                <th>تفاصيل العميل</th>
+                <th>المنتج / الباقة</th>
                 <th>التاريخ</th>
                 <th>الإجمالي</th>
                 <th>الحالة</th>
@@ -46,22 +98,47 @@
               </tr>
             </thead>
             <tbody>
-              @for (order of orders; track order.id) {
+              @for (order of filteredOrders; track order.id) {
                 <tr (click)="viewOrder(order)" class="cursor-pointer">
                   <td class="pr-4">
-                    <span class="fw-bold">#{{ order.orderNumber }}</span>
+                    <span class="fw-bold font-monospace text-primary">#{{ order.orderNumber }}</span>
+                  </td>
+                  <td>
+                    @if (order.packageId) {
+                      <span class="badge bg-warning-subtle text-warning border border-warning px-2 py-1 rounded-pill">
+                        <i class="ti ti-package me-1"></i> طلب باقة
+                      </span>
+                    } @else {
+                      <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 rounded-pill">
+                        <i class="ti ti-photo me-1"></i> طلب تصميم كارت
+                      </span>
+                    }
                   </td>
                   <td>
                     <div class="fw-semibold d-flex align-items-center gap-2">
                       {{ order.customerName }}
                       @if (order.entityType) {
-                        <span class="badge bg-light-secondary text-dark border">{{ getEntityLabel(order.entityType) }}</span>
+                        <span class="badge bg-light-secondary text-dark border ms-1">{{ getEntityLabel(order.entityType) }}</span>
                       }
                     </div>
-                    <div class="text-muted small">{{ order.customerPhone }}</div>
+                    <div class="text-muted small d-flex align-items-center gap-1 dir-ltr justify-content-end" (click)="$event.stopPropagation()">
+                      <a [href]="'https://wa.me/' + order.customerPhone.replace('+', '')" target="_blank" class="text-success text-decoration-none me-1" title="مراسلة واتساب">
+                        <i class="ti ti-brand-whatsapp fs-5"></i>
+                      </a>
+                      <span>{{ order.customerPhone }}</span>
+                    </div>
                   </td>
-                  <td>{{ order.createdAt | date: 'MMM dd, yyyy' }}</td>
-                  <td>{{ order.totalPrice | number:'1.2-2' }} L.E</td>
+                  <td>
+                    @if (order.invitationCardId) {
+                      <div class="fw-semibold text-dark">{{ getCardTitle(order.invitationCardId) }}</div>
+                    } @else if (order.packageId) {
+                      <div class="fw-semibold text-dark">{{ getPackageTitle(order.packageId) }}</div>
+                    } @else {
+                      <span class="text-muted small">طلب عام / غير محدد</span>
+                    }
+                  </td>
+                  <td class="small text-muted">{{ order.createdAt | date: 'MMM dd, yyyy' }}</td>
+                  <td class="fw-bold">{{ order.totalPrice | number:'1.2-2' }} L.E</td>
                   <td>
                     <span class="badge" [ngClass]="getStatusClass(order.status)">
                       {{ getStatusLabel(order.status) }}
@@ -69,8 +146,12 @@
                   </td>
                   <td class="text-start pl-4">
                     <div class="d-flex justify-content-start gap-1" (click)="$event.stopPropagation()">
-                      <button class="btn btn-icon btn-link-primary" (click)="viewOrder(order)">
+                      <button class="btn btn-icon btn-link-primary" (click)="viewOrder(order)" title="عرض التفاصيل">
                         <i class="ti ti-eye"></i>
+                      </button>
+
+                      <button class="btn btn-icon btn-link-success" (click)="openWhatsApp(order.customerPhone)" title="مراسلة عبر الواتساب">
+                        <i class="ti ti-brand-whatsapp"></i>
                       </button>
                       
                       <div class="dropdown d-inline-block">
@@ -89,9 +170,9 @@
                   </td>
                 </tr>
               }
-              @if (orders.length === 0) {
+              @if (filteredOrders.length === 0) {
                 <tr>
-                  <td colspan="6" class="text-center py-5 text-muted">لا يوجد طلبات حالياً.</td>
+                  <td colspan="8" class="text-center py-5 text-muted">لا يوجد طلبات في هذا القسم حالياً.</td>
                 </tr>
               }
             </tbody>

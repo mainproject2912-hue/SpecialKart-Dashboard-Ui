@@ -14,9 +14,46 @@ import { finalize } from 'rxjs';
 export class DemoRequestsComponent implements OnInit {
   requests: DemoRequest[] = [];
   loading = true;
+  searchTerm = '';
+  startDate = '';
+  endDate = '';
 
   get verified() { return this.requests.filter(r => r.isVerified).length; }
   get pending() { return this.requests.filter(r => !r.isVerified).length; }
+
+  get filteredRequests(): DemoRequest[] {
+    const term = (this.searchTerm || '').toLowerCase().trim();
+    return this.requests.filter(r => {
+      const matchesSearch = !term ||
+        (r.name ?? '').toLowerCase().includes(term) ||
+        (r.whatsAppNumber ?? '').includes(term) ||
+        (r.eventType ?? '').toLowerCase().includes(term) ||
+        (r.category ?? '').toLowerCase().includes(term);
+
+      let matchesDate = true;
+      if (r.createdAt) {
+        const msgDate = new Date(r.createdAt).getTime();
+        if (this.startDate) {
+          const start = new Date(this.startDate);
+          start.setHours(0, 0, 0, 0);
+          if (msgDate < start.getTime()) matchesDate = false;
+        }
+        if (this.endDate) {
+          const end = new Date(this.endDate);
+          end.setHours(23, 59, 59, 999);
+          if (msgDate > end.getTime()) matchesDate = false;
+        }
+      }
+
+      return matchesSearch && matchesDate;
+    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.startDate = '';
+    this.endDate = '';
+  }
 
   constructor(
     private service: DemoRequestsService,

@@ -76,6 +76,16 @@ const routes: Routes = [
         loadComponent: () => import('./demo/pages/orders/orders.component').then((c) => c.OrdersComponent)
       },
       {
+        path: 'orders/designs',
+        loadComponent: () => import('./demo/pages/orders/orders.component').then((c) => c.OrdersComponent),
+        data: { filterType: 'design' }
+      },
+      {
+        path: 'orders/packages',
+        loadComponent: () => import('./demo/pages/orders/orders.component').then((c) => c.OrdersComponent),
+        data: { filterType: 'package' }
+      },
+      {
         path: 'packages',
         loadComponent: () => import('./demo/pages/packages/packages.component').then((c) => c.PackagesComponent)
       },
