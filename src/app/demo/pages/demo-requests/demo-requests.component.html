@@ -62,6 +62,7 @@
                   <th class="py-3">Name</th>
                   <th class="py-3">WhatsApp</th>
                   <th class="py-3">Event Type</th>
+                  <th class="py-3">Category</th>
                   <th class="py-3">Status</th>
                   <th class="py-3">Image</th>
                   <th class="py-3">Date</th>
@@ -77,6 +78,13 @@
                     <td>
                       @if (r.eventType) {
                         <span class="badge bg-light text-dark border px-2 py-1">{{ r.eventType }}</span>
+                      } @else {
+                        <span class="text-muted small">—</span>
+                      }
+                    </td>
+                    <td>
+                      @if (r.category) {
+                        <span class="badge bg-light text-dark border px-2 py-1">{{ r.category === 'companies' ? 'Companies' : r.category === 'individuals' ? 'Individuals' : r.category }}</span>
                       } @else {
                         <span class="text-muted small">—</span>
                       }

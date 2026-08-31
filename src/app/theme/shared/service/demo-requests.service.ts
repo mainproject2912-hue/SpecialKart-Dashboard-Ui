@@ -10,6 +10,7 @@ export interface DemoRequest {
   isVerified: boolean;
   invitationCardId: number | null;
   eventType: string | null;
+  category: string | null;
   image: string | null;
   createdAt: string;
 }
